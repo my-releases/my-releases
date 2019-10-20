@@ -2,21 +2,97 @@
 
 namespace App\Http\Controllers;
 
+use GuzzleHttp\Client;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 
+/**
+ * @TODO REFACTOR!!!!!
+ *
+ *
+ * Class RepoController
+ * @package App\Http\Controllers
+ */
 class RepoController extends Controller
 {
-    public function repo()
+    /**
+     * @return array
+     */
+    public function repo(Request $request)
     {
+        $data = $request->get('data');
+        
+        $repo = $data['repo'] ?? null;
+        $owner = $data['owner'] ?? null;
+        $type = $data['type'] ?? 'github';
+        
+        abort_unless($owner && $repo, 400);
+        
+        $key = $repo . '.' . $owner . '.' . $type;
+        
+        $cached = Cache::get($key);
+        if (!$cached) {
+            if ($type === 'github') {
+                $data = $this->githubRepo($owner, $repo);
+                if (is_string($data)) {
+                    $cached = $this->mockGithubReleases($data);
+                } else {
+                    $cached = $data;
+                }
+            } else {
+                abort(400);
+            }
+            
+            Cache::put($key, $cached, 300);
+        }
+        
+        
+        //die(var_dump($data));
+        
+        
         //$output = $this->mockChangeLogJs();
         //$output = $this->mockLaravelChangeLog();
-        $output = $this->mockGithubReleases();
+        
         
         return [
-            'data' => $output
+            'data' => $cached
         ];
     }
     
+    private function githubRepo($owner, $repo)
+    {
+        $client = new Client();
+        $res = null;
+        
+        try {
+            $res = $client->get( 'https://api.github.com/repos/' . $owner . '/' . $repo . '/releases', [
+                'headers' => [
+                    'Authorization' => 'token ' . config('services.github.token'),
+                ]
+            ]);
+        } catch (\Exception $exception) {
+            return ['error' => $exception->getMessage()];
+        }
+        
+        if (!$res) {
+            return null;
+        }
+        
+        if ($res->getStatusCode() !== 200) {
+            die(var_dump('rtr'));
+        }
+        
+        //echo $res->getStatusCode();
+        // "200"
+        //echo $res->getHeader('content-type')[0];
+        // 'application/json; charset=utf8'
+        return $res->getBody()->getContents();
+    }
+    
+    /**
+     * @return array
+     */
     private function mockLaravelChangeLog()
     {
         $data = file_get_contents(
@@ -26,9 +102,43 @@ class RepoController extends Controller
         return $this->github($data);
     }
     
-    private function mockChangeLogJs()
+    /**
+     * @param Request $request
+     *
+     * @return array
+     */
+    public function repoValidate(Request $request)
     {
-        $data = file_get_contents(
+        $data = $request->input('data');
+        
+        preg_match('/https:\/\/github.com\/([^\/\n]*)\/([^\/\n]*)?/', $data['repo'], $matches);
+        
+        $valid = false;
+        $repo = null;
+        
+        if (count($matches) > 2) {
+            $owner = $matches[1];
+            $repo = $matches[2];
+            
+            $valid = true;
+            $repo = '/' . $owner . '/' . $repo;
+        }
+        
+        return [
+            'success' => true,
+            'data' => [
+                'valid' => $valid,
+                'path' => $repo
+            ]
+        ];
+    }
+    
+    /**
+     * @return array
+     */
+    private function mockChangeLogJs($data = null)
+    {
+        $data = $data ?: file_get_contents(
             base_path('tests/mocks/changelog.json')
         );
     
@@ -74,6 +184,7 @@ class RepoController extends Controller
             'improvement' => 'green',
             'feature' => 'green',
             'fix' => 'blue',
+            'change' => 'blue',
             'contributor' => 'blue',
             'improved' => 'blue',
             'remove' => 'red',
@@ -95,16 +206,17 @@ class RepoController extends Controller
     }
     
     
-    private function mockGithubReleases()
+    private function mockGithubReleases($data = null)
     {
         $file = 'github-releases-endpoint.json';
     
-        $data = file_get_contents(
+        $data = $data ?: file_get_contents(
             base_path('tests/mocks/' . $file)
         );
         
         $data = json_decode($data, false);
         $changes = [];
+        
         foreach ($data as $datum) {
             $date = date('F dS Y', strtotime($datum->created_at));
             $changes[] = [

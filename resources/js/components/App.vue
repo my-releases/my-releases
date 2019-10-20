@@ -1,5 +1,5 @@
 <template>
-    <div id="app-container" :class="{dark}">
+    <div id="app-container" :class="[theme]">
         <div id="main">
             <router-view></router-view>
         </div>
@@ -12,14 +12,16 @@ let name = 'App';
 /**
  * Computed properties
  */
-let computed = {};
+let computed = hx.computed([
+    'theme'
+]);
 
 /**
  * Data
  */
 let data = function() {
     return {
-        dark: true
+
     }
 };
 

@@ -12,10 +12,13 @@
 html{
     min-height:100%;/* make sure it is at least as tall as the viewport */
     position:relative;
-    height: auto;
+    //height: auto;
 }
 body{
-    height:100%; /* force the BODY element to match the height of the HTML element */
+    height:100%;
+    min-height: 100%;
+    margin: 0;
+    padding: 0;
 }
 
 .danger { color: $danger }
@@ -48,7 +51,7 @@ h1, h2, h3 { font-weight: normal; }
 input[type="checkbox"] { outline: none }
 
 #app-container {
-    & { padding: 20px; }
+    & { padding: 20px; min-height: 100%; }
     #main { width: 95%; max-width: 700px; margin: auto; }
 }
 
@@ -70,7 +73,7 @@ input[type="checkbox"] { outline: none }
 
 #repo-header {
     & { margin: 50px 0 }
-    h1 { border-bottom: 3px solid rgba($dark, 0.05); padding: 10px 0 }
+    h1 { border-bottom: 1px solid rgba($dark, 0.05); padding: 10px 0 }
 }
 
 #repo-illustration {
@@ -86,17 +89,30 @@ input[type="checkbox"] { outline: none }
     //.tag:hover b { width: 100%; }
     .tag b { width: 95%; display: inline-block }
     
-    .tag.green { background: $green; color: lighten($green, 35%) }
-    .tag.blue { background: $blue; color: lighten($blue, 35%) }
-    .tag.red { background: $red; color: lighten($red, 35%) }
+    .tag.green { background: $green; color: lighten($green, 40%) }
+    .tag.blue { background: $blue; color: lighten($blue, 40%) }
+    .tag.red { background: $red; color: lighten($red, 40%) }
     .tag.gray { background: lighten($dgray, 20%) }
 }
 
 #app-container.dark {
-    & { background: lighten($dark, 10%); color: darken($light, 20%) }
+    & { background: lighten($dark, 10%); color: lighten($dark, 60%) }
     #releases-container:before { border-left-color: lighten($dark, 15%) }
-    .release-title { color: $light }
+    .release-title { color: lighten($dark, 50%) }
     #repo-header h1 { color: $light; border-bottom-color: lighten($dark, 15%) }
+    .release-note .message strong { color: lighten($green, 30%) }
+    .release-note .tag.gray { background: lighten($dgray, 30%) }
+}
+
+#home-title {
+    & { font-size: 14pt; margin-bottom: 20px }
+    span { color: $light }
+}
+
+.search-input {
+    input { display: block; width: 100%; border-radius: 2px; padding: 10px 20px; border: none; background: lighten($dark, 20%); outline: none; transition: background 0.3s; }
+    input:focus { background: $light }
+    input:not(:focus) { color: $light }
 }
 
 @media screen and (max-width: 800px) {

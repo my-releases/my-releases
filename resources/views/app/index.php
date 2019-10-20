@@ -13,7 +13,6 @@
     <div id="application"></div>
     
     <script>
-        // You can also require other files to run in this process
         window.app = <?php echo json_encode($js) ?>;
     </script>
     
@@ -38,6 +37,6 @@
         console.info('You are running my-releases in %s mode.', app.env);
     </script>
 
-<?php include __DIR__ . '/../analytics.php' ?>
+    <?php include __DIR__ . '/../analytics.php' ?>
 </body>
 </html>

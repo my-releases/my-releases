@@ -17,7 +17,7 @@ const routes = [
  * Global states
  */
 let states = {
-    mode: 'dark'
+    theme: '' // possible value: dark
 };
 
 /**

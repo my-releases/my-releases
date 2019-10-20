@@ -17,4 +17,5 @@ use Illuminate\Http\Request;
 //    return $request->user();
 //});
 
+Route::post('repo/validate', 'RepoController@repoValidate');
 Route::get('repo', 'RepoController@repo');

@@ -52,7 +52,7 @@ helper.notify = function(title, message, type, timer) {
     }
 
     // console.log(title, message, type);
-    notify.notify(title, message, type, timer);
+    Notify.notify(title, message, type, timer);
 };
 
 /**

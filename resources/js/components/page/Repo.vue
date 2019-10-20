@@ -5,13 +5,18 @@
         </div>
         <div id="repo-header">
             <h1 v-if="repo">
+                <a href="/" class="btn btn-xs">&laquo;</a>
                 Release notes for
                 <a  target="_blank" :href="'https://github.com/' + repo.owner" v-text="repo.owner"></a> /
                 <a  target="_blank" :href="'https://github.com/' + repo.owner + '/' + repo.repo" v-text="repo.repo"></a>
             </h1>
         </div>
 
-        <div id="releases-container">
+        <div id="releases-error">
+            <span v-text="error"></span>
+        </div>
+
+        <div id="releases-container" v-if="releases">
             <div v-for="release in releases" class="release">
                 <div class="release-head">
                     <span class="release-version center" v-html="release.version"></span>
@@ -63,6 +68,7 @@ computed.repoName = function() {
 let data = function() {
     return {
         releases: null,
+        error: null
     }
 };
 
@@ -81,6 +87,12 @@ methods.fetch = function() {
 
     self.$http.get(hx.api('repo'), { data }, response => {
         if (hx.invalid(response)) {
+            return;
+        }
+
+        if (response.data.error) {
+            // hx.notify(response.data.error);
+            self.error = response.data.error;
             return;
         }
 
