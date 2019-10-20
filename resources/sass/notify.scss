@@ -1,0 +1,36 @@
+@import "./colors";
+
+#notifications {
+    position: fixed;
+    top: 10px;
+    right: 15px;
+    z-index: 100;
+}
+
+#notifications li {
+    margin-bottom: 5px;
+    list-style: none;
+}
+
+.notification {position: relative; max-width: 600px; min-width: 250px; background: white; z-index: 1; border-radius: 2px; box-shadow: 0 3px 5px rgba(0,0,0,0.2); cursor: default }
+.notification.danger { background: $red; color: #fff }
+.notification.warning { background: $warning; color: $dark }
+.notification.success { background: $green; color: #fff }
+.notification.dark { background: $dark; color: #fff }
+.notification.info { background: $blue; color: #fff }
+.notification.danger .close, .notification.success .close, .notification.warning .close { color: rgba(0, 0, 0, 0.1) }
+
+.notification .content {padding: 15px 20px; }
+.notification .title {margin: 0 0 5px 0; font-size: 16px; font-weight: normal; }
+.notification p {margin: 0; padding: 0; font-size: .9em; }
+.notification .close {position: absolute; top: 5px; right: 10px; text-decoration: none; color: #888; display: none; }
+.notification.closable .close {display: block; }
+.notification .close:hover {color: black; }
+.notification .close:active {margin-top: 1px; }
+/* close */
+.notification .close {position: absolute; top: 3px; right: 10px; text-decoration: none; color: #888; font-size: 16px; font-weight: bold; display: none; }
+
+/* scale */
+
+.notification.scale {transition: transform 400ms, opacity 400ms; transform: scale(1); }
+.notification.scale.hide {transform: translateX(300px); opacity: 0 }

@@ -1,0 +1,104 @@
+@import "./base";
+@import "./notify";
+//@import "./icons";
+
+@mixin placeholder {
+    &::-webkit-input-placeholder {@content}
+    &:-moz-placeholder           {@content}
+    &::-moz-placeholder          {@content}
+    &:-ms-input-placeholder      {@content}
+}
+
+html{
+    min-height:100%;/* make sure it is at least as tall as the viewport */
+    position:relative;
+    height: auto;
+}
+body{
+    height:100%; /* force the BODY element to match the height of the HTML element */
+}
+
+.danger { color: $danger }
+.purple { color: $purple }
+.dark { color: $dark }
+.success { color: $success }
+.warning { color: $warning }
+.red { color: $red }
+.yellow { color: $yellow }
+.primary { color: $orange2; }
+.sm { font-size: 80% }
+.pointer { cursor: pointer }
+
+.ex-scale.sm:hover { transform: scale(1.2) }
+
+.ex-spin { animation: spin infinite 1s linear; }
+// .ex-spinner { height: 13px; width: 13px; }
+@keyframes spin {
+    from {transform:rotate(0deg);}
+    to {transform:rotate(360deg);}
+}
+
+.btn-dark-on-dark { background: lighten($dark, 15); color: $light; border-color: transparent }
+.btn-dark-on-dark:hover { background: lighten($dark, 25) }
+
+.toggle { cursor: pointer }
+
+h1, h2, h3 { font-weight: normal; }
+
+input[type="checkbox"] { outline: none }
+
+#app-container {
+    & { padding: 20px; }
+    #main { width: 95%; max-width: 700px; margin: auto; }
+}
+
+.release-version {
+    & { background: $primary; display: inline-block; min-width: 120px; color: $light; padding: 5px 15px; border-radius: 3px; margin-right: 5px; z-index: 1; position: relative }
+    
+    a { color: $light }
+}
+.release-title { font-size: 15pt; }
+
+.release { margin-bottom: 100px }
+
+#releases-container {
+    & { position: relative; padding: 20px 0; }
+    &:before { border-left: 3px solid rgba($dark, 0.05); content: ''; position: absolute; left: 60px; top: 0; bottom: 0 }
+}
+
+.release-head { margin-bottom: 20px; color: $dark }
+
+#repo-header {
+    & { margin: 50px 0 }
+    h1 { border-bottom: 3px solid rgba($dark, 0.05); padding: 10px 0 }
+}
+
+#repo-illustration {
+    & { position: relative; width: 95%; max-width: 250px; text-align: center; margin: 150px auto 50px }
+    img { width: 100%; height: auto }
+}
+
+.release-note {
+    & { margin-bottom: 10px; padding-left: 80px; position: relative; margin-left: 80px; word-wrap: break-word; transition: margin 0.3s }
+    &.no-tag { padding-left: 0; }
+    .tag { padding: 5px; width: 70px; display: inline-block; color: $light; text-align: center; border-radius: 3px; font-size: 7pt; position: absolute; left: 0; text-transform: uppercase; z-index: 1 }
+    //.tag:hover { width: auto; }
+    //.tag:hover b { width: 100%; }
+    .tag b { width: 95%; display: inline-block }
+    
+    .tag.green { background: $green; color: lighten($green, 35%) }
+    .tag.blue { background: $blue; color: lighten($blue, 35%) }
+    .tag.red { background: $red; color: lighten($red, 35%) }
+    .tag.gray { background: lighten($dgray, 20%) }
+}
+
+#app-container.dark {
+    & { background: lighten($dark, 10%); color: darken($light, 20%) }
+    #releases-container:before { border-left-color: lighten($dark, 15%) }
+    .release-title { color: $light }
+    #repo-header h1 { color: $light; border-bottom-color: lighten($dark, 15%) }
+}
+
+@media screen and (max-width: 800px) {
+    .release-note { margin-left: 30px; }
+}
