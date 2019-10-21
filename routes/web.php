@@ -10,4 +10,5 @@ Route::get('legal/terms', 'LegalController@terms');
  */
 Route::get('/', 'AppController@index');
 Route::get('/{owner}/{repo}', 'AppController@repo');
+Route::get('/markdown', 'AppController@markdown');
 

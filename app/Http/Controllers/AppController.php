@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Contracts\View\Factory;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class AppController extends Controller
@@ -27,6 +28,20 @@ class AppController extends Controller
     {
         return $this->render([
             'title' => 'Release notes for ' . $owner . '/' . $route
+        ]);
+    }
+    
+    /**
+     * @param $owner
+     * @param $route
+     *
+     * @return Factory|View
+     */
+    public function markdown(Request $request)
+    {
+        $url = $request->input('url');
+        return $this->render([
+            'title' => 'Release notes for ' . $url
         ]);
     }
     

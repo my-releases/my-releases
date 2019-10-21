@@ -51,7 +51,7 @@ h1, h2, h3 { font-weight: normal; }
 input[type="checkbox"] { outline: none }
 
 #app-container {
-    & { padding: 20px; min-height: 100%; }
+    & { padding: 20px; min-height: 100%; transition: background 0.75s }
     #main { width: 95%; max-width: 700px; margin: auto; }
 }
 
@@ -73,7 +73,7 @@ input[type="checkbox"] { outline: none }
 
 #repo-header {
     & { margin: 50px 0 }
-    h1 { border-bottom: 1px solid rgba($dark, 0.05); padding: 10px 0 }
+    h1 { border-bottom: 1px solid rgba($dark, 0.05); padding: 10px 0; word-wrap: break-word }
 }
 
 #repo-illustration {
@@ -95,25 +95,37 @@ input[type="checkbox"] { outline: none }
     .tag.gray { background: lighten($dgray, 20%) }
 }
 
-#app-container.dark {
-    & { background: lighten($dark, 10%); color: lighten($dark, 60%) }
-    #releases-container:before { border-left-color: lighten($dark, 15%) }
-    .release-title { color: lighten($dark, 50%) }
-    #repo-header h1 { color: $light; border-bottom-color: lighten($dark, 15%) }
-    .release-note .message strong { color: lighten($green, 30%) }
-    .release-note .tag.gray { background: lighten($dgray, 30%) }
-}
-
 #home-title {
     & { font-size: 14pt; margin-bottom: 20px }
-    span { color: $light }
+    span { color: $primary }
 }
 
 .search-input {
-    input { display: block; width: 100%; border-radius: 2px; padding: 10px 20px; border: none; background: lighten($dark, 20%); outline: none; transition: background 0.3s; }
+    input { display: block; width: 100%; border-radius: 2px; padding: 10px 20px; border: none; background: lighten($dark, 70%); outline: none; transition: background 0.3s; @include placeholder { color: $dgray; } }
     input:focus { background: $light }
-    input:not(:focus) { color: $light }
+    input:not(:focus) { color: $dark }
 }
+
+#head-top { position: relative; text-align: right; width: 95%; max-width: 900px; }
+
+#theme-toggle {
+    & { cursor: pointer };
+}
+
+#app-container.dark {
+    & { background: lighten($dark, 10%); color: lighten($dark, 60%) }
+    #releases-container:before { border-left-color: lighten($dark, 15%) }
+    .release-title { color: lighten($dark, 50%); }
+    #repo-header h1 { color: $light; border-bottom-color: lighten($dark, 15%); word-wrap: break-word }
+    .release-note .message strong { color: lighten($green, 30%) }
+    .release-note .tag.gray { background: lighten($dgray, 30%) }
+    
+    .search-input input { background: lighten($dark, 20%); }
+    .search-input input:focus { color: $dark; background: $light }
+    .search-input input:not(:focus) { color: $light }
+    #home-title span { color: $light }
+}
+
 
 @media screen and (max-width: 800px) {
     .release-note { margin-left: 30px; }

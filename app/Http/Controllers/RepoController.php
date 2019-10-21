@@ -25,21 +25,26 @@ class RepoController extends Controller
         
         $repo = $data['repo'] ?? null;
         $owner = $data['owner'] ?? null;
+        $url = $data['url'] ?? null;
         $type = $data['type'] ?? 'github';
         
-        abort_unless($owner && $repo, 400);
+        abort_unless(($owner && $repo) || ($type === 'markdown' && $url), 400);
         
-        $key = $repo . '.' . $owner . '.' . $type;
+        $key = $repo . '.' . $owner . '.' . $type . '.' . $url;
         
         $cached = Cache::get($key);
+        //$cached = null;
         if (!$cached) {
             if ($type === 'github') {
                 $data = $this->githubRepo($owner, $repo);
-                if (is_string($data)) {
+                if( is_string($data) ) {
                     $cached = $this->mockGithubReleases($data);
                 } else {
                     $cached = $data;
                 }
+            } else if ($type === 'markdown') {
+                $data = $this->fetch($url);
+                $cached = $this->github($data);
             } else {
                 abort(400);
             }
@@ -80,13 +85,31 @@ class RepoController extends Controller
         }
         
         if ($res->getStatusCode() !== 200) {
-            die(var_dump('rtr'));
+            return ['error' => 'Repo not found!'];
         }
         
-        //echo $res->getStatusCode();
-        // "200"
-        //echo $res->getHeader('content-type')[0];
-        // 'application/json; charset=utf8'
+        return $res->getBody()->getContents();
+    }
+    
+    private function fetch($url)
+    {
+        $client = new Client();
+        $res = null;
+        
+        try {
+            $res = $client->get( $url);
+        } catch (\Exception $exception) {
+            return ['error' => $exception->getMessage()];
+        }
+        
+        if (!$res) {
+            return null;
+        }
+        
+        if ($res->getStatusCode() !== 200) {
+            return ['error' => 'Repo not found!'];
+        }
+        
         return $res->getBody()->getContents();
     }
     
@@ -122,6 +145,11 @@ class RepoController extends Controller
             
             $valid = true;
             $repo = '/' . $owner . '/' . $repo;
+        }
+        
+        if (!$valid && filter_var($data['repo'], FILTER_VALIDATE_URL)) {
+            $valid = true;
+            $repo = 'markdown?url=https://raw.githubusercontent.com/rstacruz/nprogress/master/History.md';
         }
         
         return [
@@ -185,11 +213,13 @@ class RepoController extends Controller
             'feature' => 'green',
             'fix' => 'blue',
             'change' => 'blue',
+            'update' => 'blue',
             'contributor' => 'blue',
             'improved' => 'blue',
             'remove' => 'red',
             'revert' => 'red',
-            'important' => 'red'
+            'important' => 'red',
+            'break' => 'red',
         ];
     
         $found = null;

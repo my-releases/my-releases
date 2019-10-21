@@ -1,5 +1,10 @@
 <template>
     <div id="app-container" :class="[theme]">
+        <div id="head-top">
+            <div id="theme-toggle">
+                <span @click="themeSwitch" v-text="isDark ? 'Light' : 'Dark'"></span>
+            </div>
+        </div>
         <div id="main">
             <router-view></router-view>
         </div>
@@ -17,6 +22,13 @@ let computed = hx.computed([
 ]);
 
 /**
+ * Is Dark theme
+ */
+computed.isDark = function() {
+    return this.theme === 'dark';
+};
+
+/**
  * Data
  */
 let data = function() {
@@ -28,14 +40,25 @@ let data = function() {
 /**
  * Component methods
  */
-let methods = {};
+let methods = hx.methods([
+    'stateStoreInStorage', 'stateLoadFromStorage'
+]);
+
+/**
+ * Switch theme
+ */
+methods.themeSwitch = function() {
+    this.theme = this.theme === 'dark' ? 'light' : 'dark';
+
+    this.stateStoreInStorage();
+};
 
 /**
  * Mounted hook.
  * Triggered once html has been injected
  */
 let mounted = function() {
-
+    this.stateLoadFromStorage();
 };
 
 /**

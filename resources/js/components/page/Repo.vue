@@ -7,8 +7,13 @@
             <h1 v-if="repo">
                 <a href="/" class="btn btn-xs">&laquo;</a>
                 Release notes for
-                <a  target="_blank" :href="'https://github.com/' + repo.owner" v-text="repo.owner"></a> /
-                <a  target="_blank" :href="'https://github.com/' + repo.owner + '/' + repo.repo" v-text="repo.repo"></a>
+                <template v-if="isMarkdown">
+                    <a target="_blank" :href="repoName" v-text="repoName"></a>
+                </template>
+                <template v-if="!isMarkdown">
+                    <a target="_blank" :href="'https://github.com/' + repo.owner" v-text="repo.owner"></a> /
+                    <a target="_blank" :href="'https://github.com/' + repo.owner + '/' + repo.repo" v-text="repo.repo"></a>
+                </template>
             </h1>
         </div>
 
@@ -16,7 +21,7 @@
             <span v-text="error"></span>
         </div>
 
-        <div id="releases-container" v-if="releases">
+        <div id="releases-container" v-if="releases && releases.length">
             <div v-for="release in releases" class="release">
                 <div class="release-head">
                     <span class="release-version center" v-html="release.version"></span>
@@ -32,6 +37,9 @@
                     </div>
                 </div>
             </div>
+        </div>
+        <div v-if="releases && releases.length === 0">
+            <h3>- No Release Notes Found.</h3>
         </div>
     </div>
 </template>
@@ -53,11 +61,19 @@ computed.repo = function() {
     return self.$route.params;
 };
 
+computed.isMarkdown = function() {
+    return this.$route.name === 'markdown';
+}
+
 /**
  * Repo name
  */
 computed.repoName = function() {
     let self = this;
+
+    if (self.isMarkdown) {
+        return self.$route.query.url;
+    }
 
     return self.repo.owner + '/' + self.repo.repo;
 };
@@ -85,50 +101,25 @@ methods.fetch = function() {
 
     let data = self.$route.params;
 
+    if(self.$route.name === 'markdown') {
+        data = self.$route.query || {};
+        data.type = 'markdown';
+    }
+
+    self.releases = null;
     self.$http.get(hx.api('repo'), { data }, response => {
         if (hx.invalid(response)) {
             return;
         }
 
         if (response.data.error) {
-            // hx.notify(response.data.error);
             self.error = response.data.error;
             return;
         }
 
-        // let releases = [];
-        //
-        // console.log(response.data);
-        // response.data.forEach((release, r) => {
-        //     release.changes.forEach((change, c) => {
-        //         console.log(change);
-        //         release.data[r].changes[c].message = 'hmm';
-        //     })
-        //     // console.log(release);
-        // });
-
-        // for (let r in response.data) {
-        //     if(!response.data.hasOwnProperty(r)) {
-        //         continue;
-        //     }
-        //     let release = response.data[r];
-        //
-        //     for (let c in release.changes) {
-        //         if (!release.changes.hasOwnProperty(c)) {
-        //             continue;
-        //         }
-        //
-        //         let change = release.changes[c];
-        //
-        //         console.log(change);
-        //         release.changes[c].message = 'hmm';
-        //     }
-        // }
-
         self.releases = response.data;
     });
 
-    // console.log(self.$route.params);
 };
 
 /**
