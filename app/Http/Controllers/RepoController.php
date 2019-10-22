@@ -32,13 +32,13 @@ class RepoController extends Controller
         
         $key = $repo . '.' . $owner . '.' . $type . '.' . $url;
         
-        $cached = Cache::get($key);
-        //$cached = null;
+        // $cached = Cache::get($key);
+        $cached = null;
         if (!$cached) {
             if ($type === 'github') {
                 $data = $this->githubRepo($owner, $repo);
                 if( is_string($data) ) {
-                    $cached = $this->mockGithubReleases($data);
+                    $cached = $this->mockGithubReleases($data, $owner.'/'.$repo);
                 } else {
                     $cached = $data;
                 }
@@ -211,14 +211,14 @@ class RepoController extends Controller
             'new' => 'green',
             'improvement' => 'green',
             'feature' => 'green',
-            'fix' => 'blue',
-            'change' => 'blue',
+            'fix' => 'red',
+            'important' => 'red',
+            'change' => 'lblue',
             'update' => 'blue',
             'contributor' => 'blue',
             'improved' => 'blue',
-            'remove' => 'red',
-            'revert' => 'red',
-            'important' => 'red',
+            'remove' => 'gray',
+            'revert' => 'gray',
             'break' => 'red',
         ];
     
@@ -235,28 +235,30 @@ class RepoController extends Controller
         return $found;
     }
     
-    
-    private function mockGithubReleases($data = null)
+    private function mockGithubReleases($data = null, $repo = null)
     {
-        $file = 'github-releases-endpoint.json';
+        // $file = 'github-releases-endpoint.json';
     
-        $data = $data ?: file_get_contents(
-            base_path('tests/mocks/' . $file)
-        );
+        // $data = $data ?: file_get_contents(
+        //     base_path('tests/mocks/' . $file)
+        // );
         
         $data = json_decode($data, false);
         $changes = [];
         
         foreach ($data as $datum) {
-            $date = date('F dS Y', strtotime($datum->created_at));
-            $changes[] = [
+            $time = strtotime($datum->created_at);
+            $date = date('F jS Y', $time);
+            $changes[$time] = [
                 'version' => $datum->tag_name,
                 'title' => $date,
-                'changes' => $this->mapChanges(explode("\r\n", $datum->body), -1)
+                'changes' => $this->mapChanges(explode("\r\n", $datum->body), -1, null, $repo)
             ];
         }
+
+        krsort($changes);
         
-        return $changes;
+        return array_values($changes);
         
     }
     
@@ -274,11 +276,8 @@ class RepoController extends Controller
     
         $md = new \Parsedown();
         $md->setSafeMode(true);
-        
-        //dd($data);
-        
+
         foreach ($data as $i => $item) {
-            //$output[] = $data;
             
             if( !Str::startsWith($item, '## ') ) {
                 continue;
@@ -287,12 +286,9 @@ class RepoController extends Controller
             $changes = $this->mapChanges($data, $i, $linesMax);
             
             $output[] = [
-                //'title' => 'November 12, 2019',
                 'version' => $md->line(str_replace('## ', '', $item)),
                 'changes' => $changes
             ];
-            
-            //$counter++;
         }
         
         return $output;
@@ -305,7 +301,7 @@ class RepoController extends Controller
      *
      * @return array
      */
-    private function mapChanges(array $data, $i = 0, $linesMax = null): array
+    private function mapChanges(array $data, $i = 0, $linesMax = null, $repo = null): array
     {
         $valid = true;
         $max = 1000;
@@ -324,8 +320,7 @@ class RepoController extends Controller
             $j++;
             //$counter++;
             $line = $data[ $i + $j ] ?? null;
-            //dd($line);
-            
+
             if( $line === null ) {
                 break;
             }
@@ -351,13 +346,20 @@ class RepoController extends Controller
             if( strpos($line, '* ') !== false ) {
                 $line = substr_replace($line, '', 0, 2);
             }
+
+            if ($repo) {
+                $rep = '[#$1](https://github.com/'.$repo.'/pull/$1)';
+                // $line = preg_replace('/[^\[]\#(\d+)[^\]]/', $rep, $line);
+                // $line = preg_replace('/[^\[]?\#(\d+)[^\]]?/', $rep, $line);
+                $line = preg_replace('/\[\#(\d+)\]\(http[^)]*\)/', '#$1', $line);
+                $line = preg_replace('/\#(\d+)/', $rep, $line);
+            }
             
-            //$tag = 'Added';
             $changes[] = [
                 'tag' => $tag,
                 'type' => $this->getType($tag),
-                'message' => $md->line($line),
-                //'message' => $line
+                'message' => trim($md->line($line)),
+                // 'message' => $line
             ];
         }
         

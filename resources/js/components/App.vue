@@ -1,5 +1,5 @@
 <template>
-    <div id="app-container" :class="[theme]">
+    <div id="app-container">
         <div id="head-top">
             <div id="theme-toggle">
                 <span @click="themeSwitch" v-text="isDark ? 'Light' : 'Dark'"></span>

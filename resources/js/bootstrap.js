@@ -79,10 +79,10 @@ Bootstrap.make = function(routes, states = null) {
      */
     return new Vue({
         store,
+        computed: hx.computed(['theme']),
         components: {
-            // app: require('./components/App.vue').default
+            app: require('./components/App.vue').default
         },
-        template: `<router-view></router-view>`,
         router
     });
 };

@@ -6,14 +6,14 @@ let Repo = require('./components/page/Repo.vue').default;
  * Define Routes
  */
 const routes = [
-    {
-        path: '/', component: require('./components/App.vue').default, children: [
-            { name: 'home', path: '', component: require('./components/page/Home.vue').default},
-            { name: 'repo', path: ':owner/:repo', component: Repo },
-            { name: 'markdown', path: 'markdown', component: Repo },
+    // {
+        // path: '/', component: require('./components/App.vue').default, children: [
+            { name: 'home', path: '/', component: require('./components/page/Home.vue').default},
+            { name: 'repo', path: '/:owner/:repo', component: Repo },
+            { name: 'markdown', path: '/markdown', component: Repo },
             { name: 'not.found', path: '*', component: require('./components/page/NotFound.vue').default },
-        ]
-    },
+        // ]
+    // },
 ];
 
 /**
@@ -28,4 +28,4 @@ let states = {
  */
 Bootstrap
     .make(routes, states)
-    .$mount('#application');
+    .$mount('#app-wrapper');

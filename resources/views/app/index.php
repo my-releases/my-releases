@@ -10,7 +10,15 @@
     
 </head>
 <body>
-    <div id="application"></div>
+    <div id="app-wrapper" :class="[theme]">
+        <app></app>
+    
+        <div id="footer-bar">
+            <a href="https://github.com/my-releases" target="_blank">GitHub</a> &middot;
+            <a href="https://undraw.co" target="_blank">Icons by <b>unDraw</b></a> &middot;
+            <a href="https://www.bright.sh" target="_blank">Deployed with <b>Bright.sh</b></a>
+        </div>
+    </div>
     
     <script>
         window.app = <?php echo json_encode($js) ?>;

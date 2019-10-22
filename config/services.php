@@ -32,6 +32,10 @@ return [
     
     'github' => [
         'token' => env('GITHUB_TOKEN')
+    ],
+
+    'analytics' => [
+        'id' => env('ANALTYICS_ID'),
     ]
 
 ];
