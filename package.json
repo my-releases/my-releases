@@ -15,7 +15,7 @@
         "cypress": "3.4.1",
         "dayjs": "1.8.16",
         "laravel-mix": "4.0.16",
-        "lodash": "4.17.15",
+        "lodash": "4.17.19",
         "markdown-it": "^10.0.0",
         "resolve-url-loader": "2.3.2",
         "sass": "1.22.12",
